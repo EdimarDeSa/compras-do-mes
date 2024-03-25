@@ -1,5 +1,6 @@
 use chrono::{NaiveDate, NaiveDateTime, Utc};
 use diesel::prelude::*;
+use std::collections::HashMap;
 use uuid::Uuid;
 
 #[derive(Queryable, Selectable, Insertable, Debug, Clone)]
@@ -69,8 +70,5 @@ pub struct AuthUser {
 #[derive(Debug, Clone)]
 pub struct AlterUser {
     pub id: Uuid,
-    pub nickname: Option<String>,
-    pub email: Option<String>,
-    pub password: Option<String>,
-    pub birth_date: Option<NaiveDate>,
+    pub changes: HashMap<String, String>,
 }

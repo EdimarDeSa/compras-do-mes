@@ -36,15 +36,15 @@ async fn main() {
     let verifying = auth::check_jwt_token(&token.token, &user.id.to_string());
     println!("Token verificado: {:?}", verifying);
 
-    let alter_user = AlterUser {
-        id: user.id,
-        nickname: Some("Fulanisson de Teste Alterado".to_string()),
-        email: None,
-        password: None,
-        birth_date: None,
-    };
-    let altered = update_user::update(alter_user).unwrap();
-    println!("Usuário alterado: {:?}", altered);
+    // let alter_user = AlterUser {
+    //     id: user.id,
+    //     nickname: Some("Fulanisson de Teste Alterado".to_string()),
+    //     email: None,
+    //     password: None,
+    //     birth_date: None,
+    // };
+    // let altered = update_user::update(alter_user).unwrap();
+    // println!("Usuário alterado: {:?}", altered);
 
     let user = read_user::find_with_email(&email).unwrap();
     println!("Usuário encontrado: {:?}", user);

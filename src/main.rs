@@ -5,11 +5,10 @@ use chrono::prelude::*;
 use diesel::prelude::*;
 use std::process::exit;
 
+use compras_do_mes::auth;
 use compras_do_mes::connection;
-use compras_do_mes::models::NewUser;
-use compras_do_mes::users::auth;
-use compras_do_mes::users::create_user;
-use compras_do_mes::users::read_user;
+use compras_do_mes::users::user_models::NewUser;
+use compras_do_mes::users::*;
 
 #[tokio::main]
 async fn main() {
@@ -36,4 +35,7 @@ async fn main() {
 
     let verifying = auth::check_jwt_token(&token.token, &user.id.to_string());
     println!("Token verificado: {:?}", verifying);
+
+    let deletion = delete_user::remove(&user.id);
+    println!("{:?}", deletion);
 }

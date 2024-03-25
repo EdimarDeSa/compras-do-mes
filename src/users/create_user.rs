@@ -4,9 +4,9 @@ use diesel::insert_into;
 use diesel::prelude::*;
 use regex::Regex;
 
-use crate::models::{FullUser, NewUser, User};
 use crate::schema::users;
 use crate::users::read_user;
+use crate::users::user_models::{FullUser, NewUser, User};
 
 #[derive(Debug)]
 pub enum CreationError {

@@ -1,13 +1,14 @@
-pub mod models;
-
 pub mod schema;
 
 pub mod connection;
 
+pub mod auth;
+
 pub mod users {
-    pub mod auth;
     pub mod create_user;
+    pub mod delete_user;
     pub mod read_user;
+    pub mod user_models;
 }
 
 pub mod constants {
@@ -21,4 +22,3 @@ pub mod constants {
 
     pub const JWT_SECRET: &str = "JWT_SECRET";
 }
-

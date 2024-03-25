@@ -11,76 +11,146 @@ use crate::users::user_models::{FullUser, NewUser, User};
 #[derive(Debug)]
 pub enum CreationError {
     InvalidPassword(String),
-    InvalidEmail(String),
-    UserAlreadyExists(String),
-    CommunicationFailed(String),
+    InvalidEmail,
+    UserAlreadyExists,
+    TransactionError(String),
+    EncryptionError(String),
+    RegexError(String),
+}
+
+impl From<diesel::result::Error> for CreationError {
+    fn from(error: diesel::result::Error) -> Self {
+        CreationError::TransactionError(error.to_string())
+    }
 }
 
 pub fn new(new_user: &NewUser) -> Result<User, CreationError> {
+    if let Err(e) = validate_user_data(&new_user) {
+        return Err(e);
+    }
+
+    let full_user = match create_full_user(new_user) {
+        Ok(u) => u,
+        Err(e) => return Err(e),
+    };
+
     let conn = &mut connection::establish_connection();
+    conn.transaction::<_, CreationError, _>(|conn| {
+        match insert_into(users::table)
+            .values(full_user)
+            .returning(User::as_returning())
+            .get_result(conn)
+        {
+            Ok(user) => Ok(user),
+            Err(e) => Err(CreationError::TransactionError(e.to_string())),
+        }
+    })
+}
 
-    if !validate_password(&new_user.password) {
+fn validate_user_data(new_user: &NewUser) -> Result<(), CreationError> {
+    if let Err(e) = validate_password(&new_user.password) {
+        return Err(e);
+    }
+
+    if let Err(e) = validate_email(&new_user.email) {
+        return Err(e);
+    }
+
+    if let Err(e) = exist_user(&new_user.email) {
+        return Err(e);
+    }
+}
+
+fn validate_password(password: &str) -> Result<(), CreationError> {
+    if password.is_empty() {
         return Err(CreationError::InvalidPassword(
-            "Password must have at last:\n\
-            One lowercase letter\n\
-            One uppercase letter\n\
-            One digit\n\
-            One special character from [@$!%*?&]\n\
-            Minimum length of 8 digits."
-                .to_string(),
+            "Password cannot be empty!".to_string(),
         ));
     }
 
-    if !validate_email(&new_user.email) {
-        return Err(CreationError::InvalidEmail("Invalid email".to_string()));
-    }
+    match Regex::new(r"[a-z]") {
+        Ok(r) => {
+            if !r.is_match(password) {
+                return Err(CreationError::InvalidPassword(
+                    "Password must be at last one lowercase letter".to_string(),
+                ));
+            }
+        }
+        Err(e) => return Err(CreationError::RegexError(e.to_string())),
+    };
 
-    if exist_user(&new_user.email) {
-        return Err(CreationError::UserAlreadyExists(
-            "User already exists.".to_string(),
-        ));
-    }
+    match Regex::new(r"[A-Z]") {
+        Ok(r) => {
+            if !r.is_match(password) {
+                return Err(CreationError::InvalidPassword(
+                    "Password must be at last one uppercase letter".to_string(),
+                ));
+            }
+        }
+        Err(e) => return Err(CreationError::RegexError(e.to_string())),
+    };
+    match Regex::new(r"\d") {
+        Ok(r) => {
+            if !r.is_match(password) {
+                return Err(CreationError::InvalidPassword(
+                    "Password must be at last one digit".to_string(),
+                ));
+            }
+        }
+        Err(e) => return Err(CreationError::RegexError(e.to_string())),
+    };
+    match Regex::new(r"[@$!%*?&]") {
+        Ok(r) => {
+            if !r.is_match(password) {
+                return Err(CreationError::InvalidPassword(
+                    "Password must be at last one special character -> (@$!%*?&)".to_string(),
+                ));
+            }
+        }
+        Err(e) => return Err(CreationError::RegexError(e.to_string())),
+    };
+    match Regex::new(r".{8,}") {
+        Ok(r) => {
+            if !r.is_match(password) {
+                return Err(CreationError::InvalidPassword(
+                    "Password must be at least 8 characters long".to_string(),
+                ));
+            }
+        }
+        Err(e) => return Err(CreationError::RegexError(e.to_string())),
+    };
 
+    Ok(())
+}
+
+fn validate_email(e_mail: &str) -> Result<(), CreationError> {
+    match Regex::new(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$") {
+        Ok(r) => {
+            if !r.is_match(e_mail) {
+                return Err(CreationError::InvalidEmail);
+            }
+        }
+        Err(e) => return Err(CreationError::RegexError(e.to_string())),
+    };
+
+    Ok(())
+}
+
+fn exist_user(e_mail: &str) -> Result<(), CreationError> {
+    if read_user::find(e_mail).is_some() {
+        return Err(CreationError::UserAlreadyExists);
+    }
+    Ok(())
+}
+
+fn create_full_user(new_user: &NewUser) -> Result<FullUser, CreationError> {
     let mut full_user = FullUser::new(new_user);
 
-    full_user.password = bcrypt::hash(&full_user.password, bcrypt::DEFAULT_COST).unwrap();
-
-    match insert_into(users::table)
-        .values(&full_user)
-        .returning(User::as_returning())
-        .get_result(conn)
-    {
-        Ok(user) => Ok(user),
-        Err(_) => Err(CreationError::CommunicationFailed(
-            "Failed to insert user.".to_string(),
-        )),
+    match bcrypt::hash(&full_user.password, bcrypt::DEFAULT_COST) {
+        Ok(hashed_password) => {
+            full_user.password = hashed_password;
+            Ok(full_user)
+        },
+        Err(e) => return Err(CreationError::EncryptionError(e.to_string())),
     }
-}
-
-fn validate_password(password: &str) -> bool {
-    if password.is_empty() {
-        return false;
-    }
-
-    let has_lowercase = Regex::new(r"[a-z]").unwrap();
-    let has_uppercase = Regex::new(r"[A-Z]").unwrap();
-    let has_number = Regex::new(r"\d").unwrap();
-    let has_symbol = Regex::new(r"[@$!%*?&]").unwrap();
-    let has_length = Regex::new(r".{8,}").unwrap();
-
-    has_lowercase.is_match(password)
-        && has_uppercase.is_match(password)
-        && has_number.is_match(password)
-        && has_symbol.is_match(password)
-        && has_length.is_match(password)
-}
-
-fn validate_email(e_mail: &str) -> bool {
-    let is_email = Regex::new(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").unwrap();
-
-    is_email.is_match(e_mail)
-}
-
-fn exist_user(e_mail: &str) -> bool {
-    read_user::find(e_mail).is_some()
 }

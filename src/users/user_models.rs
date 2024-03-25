@@ -16,17 +16,25 @@ pub struct FullUser {
 
 impl FullUser {
     pub fn new(new_user: &NewUser) -> Self {
-        let id = Uuid::new_v4();
-
-        let created_at = Utc::now().naive_utc();
-
         Self {
-            id,
             nickname: new_user.nickname.clone(),
             email: new_user.email.clone(),
             password: new_user.password.clone(),
             birth_date: new_user.birth_date,
-            created_at,
+            ..Default::default()
+        }
+    }
+}
+
+impl Default for FullUser {
+    fn default() -> Self {
+        Self {
+            id: Uuid::new_v4(),
+            nickname: "".to_string(),
+            email: "".to_string(),
+            password: "".to_string(),
+            birth_date: None,
+            created_at: Utc::now().naive_utc(),
         }
     }
 }
@@ -56,4 +64,13 @@ pub struct NewUser {
 pub struct AuthUser {
     pub id: Uuid,
     pub password: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct AlterUser {
+    pub id: Uuid,
+    pub nickname: Option<String>,
+    pub email: Option<String>,
+    pub password: Option<String>,
+    pub birth_date: Option<NaiveDate>,
 }

@@ -30,7 +30,7 @@ pub fn find_for_auth(e_mail: &str) -> Option<AuthUser> {
     }
 }
 
-pub fn find_for_delete(_id: &Uuid) -> Option<User> {
+pub fn find_with_id(_id: &Uuid) -> Option<User> {
     let conn = &mut connection::establish_connection();
 
     match users

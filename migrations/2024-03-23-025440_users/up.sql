@@ -1,8 +1,0 @@
--- Your SQL goes here
-CREATE TABLE users (
-id UUID PRIMARY KEY,
-nickname VARCHAR(150) NOT NULL,
-email VARCHAR(250) NOT NULL,
-password VARCHAR(100) NOT NULL,
-birthday DATE,
-cad_date TIMESTAMPTZ NOT NULL)

@@ -1,7 +1,7 @@
+use crate::connection;
 use crate::models::{AuthUser, User};
 use crate::schema::users::dsl::*;
 use diesel::prelude::*;
-use crate::connection;
 
 pub fn find(e_mail: &str) -> Option<User> {
     let conn = &mut connection::establish_connection();

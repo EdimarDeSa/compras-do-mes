@@ -1,8 +1,8 @@
+use crate::connection;
 use bcrypt;
 use diesel::insert_into;
 use diesel::prelude::*;
 use regex::Regex;
-use crate::connection;
 
 use crate::models::{FullUser, NewUser, User};
 use crate::schema::users;

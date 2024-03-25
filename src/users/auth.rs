@@ -6,8 +6,8 @@ use serde::Serialize;
 use sha2::Sha256;
 use std::collections::BTreeMap;
 
+use crate::constants::constants::{ID, JWT_SECRET};
 use crate::users::read_user;
-use crate::constants::constants::ID;
 
 #[derive(Debug)]
 pub enum AuthError {
@@ -34,7 +34,7 @@ pub struct Token {
 }
 
 fn generate_jwt_token(id: &str) -> Token {
-    let secret = dotenv::var("JWT_SECRET").unwrap();
+    let secret = dotenv::var(JWT_SECRET).unwrap();
 
     let key: Hmac<Sha256> = Hmac::new_from_slice(&secret.into_bytes()).unwrap();
 
@@ -46,7 +46,7 @@ fn generate_jwt_token(id: &str) -> Token {
 }
 
 pub fn check_jwt_token(token_str: &str, id: &str) -> bool {
-    let secret = dotenv::var("JWT_SECRET").unwrap();
+    let secret = dotenv::var(JWT_SECRET).unwrap();
     let key: Hmac<Sha256> = Hmac::new_from_slice(&secret.into_bytes()).unwrap();
 
     let claims: BTreeMap<String, String> = token_str.verify_with_key(&key).unwrap();

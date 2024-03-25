@@ -13,12 +13,12 @@ use compras_do_mes::users::read_user;
 #[tokio::main]
 async fn main() {
     let conn = &mut connection::establish_connection();
-    let email = "edimarfreitas95@gmail.com".to_string();
+    let email = "email_super.criativo@queemail.com".to_string();
 
     let new_user = NewUser {
-        nickname: "Edimar".to_string(),
+        nickname: "Fulanisson de Teste".to_string(),
         email: email.clone(),
-        password: "048Edim@r258".to_string(),
+        password: "Senh@Mu1toF0rt3".to_string(),
         birth_date: Some(NaiveDate::parse_from_str("1995-09-04", "%Y-%m-%d").unwrap()),
     };
 

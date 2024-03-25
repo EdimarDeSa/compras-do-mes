@@ -1,5 +1,4 @@
 use bcrypt;
-use diesel::PgConnection;
 use dotenv;
 use hmac::{Hmac, Mac};
 use jwt::{SignWithKey, VerifyWithKey};
@@ -8,18 +7,16 @@ use sha2::Sha256;
 use std::collections::BTreeMap;
 
 use crate::users::read_user;
-
-const ID: &str = "id";
+use crate::constants::constants::ID;
 
 #[derive(Debug)]
 pub enum AuthError {
     InvalidPassword,
-    InvalidEmail,
     UserNotFound,
 }
 
-pub fn login(conn: &mut PgConnection, email: &str, password: &str) -> Result<Token, AuthError> {
-    if let Some(user) = read_user::find_for_auth(conn, email) {
+pub fn login(email: &str, password: &str) -> Result<Token, AuthError> {
+    if let Some(user) = read_user::find_for_auth(email) {
         if !bcrypt::verify(password, &user.password).unwrap() {
             return Err(AuthError::InvalidPassword);
         }

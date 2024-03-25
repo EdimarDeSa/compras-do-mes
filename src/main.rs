@@ -1,5 +1,7 @@
 #![allow(unused)]
 
+use std::process::exit;
+use dotenv;
 use axum::{routing::get, Router};
 use chrono::prelude::*;
 use diesel::prelude::*;
@@ -12,9 +14,9 @@ use compras_do_mes::users::read_user;
 
 #[tokio::main]
 async fn main() {
-    let conn = &mut connection::establish_connection();
-    let email = "email_super.criativo@queemail.com".to_string();
+    dotenv::dotenv().ok();
 
+    let email = "email_super.criativo@queemail.com".to_string();
     let new_user = NewUser {
         nickname: "Fulanisson de Teste".to_string(),
         email: email.clone(),
@@ -22,15 +24,15 @@ async fn main() {
         birth_date: Some(NaiveDate::parse_from_str("1995-09-04", "%Y-%m-%d").unwrap()),
     };
 
-    match create_user::new(conn, &new_user) {
+    match create_user::new(&new_user) {
         Ok(u) => println!("Usuário criado com sucesso! \n {:?}", u),
         Err(e) => println!("Erro ao criar usuário: {:?}", e),
     };
 
-    let user = read_user::find(conn, &email).unwrap();
+    let user = read_user::find(&email).unwrap();
     println!("Usuário encontrado: {:?}", user);
 
-    let token = auth::login(conn, &new_user.email, &new_user.password).unwrap();
+    let token = auth::login(&new_user.email, &new_user.password).unwrap();
     println!("Token gerado: {:?}", token);
 
     let verifying = auth::check_jwt_token(&token.token, &user.id.to_string());

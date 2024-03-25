@@ -2,6 +2,7 @@ use bcrypt;
 use diesel::insert_into;
 use diesel::prelude::*;
 use regex::Regex;
+use crate::connection;
 
 use crate::models::{FullUser, NewUser, User};
 use crate::schema::users;
@@ -15,7 +16,9 @@ pub enum CreationError {
     CommunicationFailed(String),
 }
 
-pub fn new(conn: &mut PgConnection, new_user: &NewUser) -> Result<User, CreationError> {
+pub fn new(new_user: &NewUser) -> Result<User, CreationError> {
+    let conn = &mut connection::establish_connection();
+
     if !validate_password(&new_user.password) {
         return Err(CreationError::InvalidPassword(
             "Password must have at last:\n\
@@ -32,7 +35,7 @@ pub fn new(conn: &mut PgConnection, new_user: &NewUser) -> Result<User, Creation
         return Err(CreationError::InvalidEmail("Invalid email".to_string()));
     }
 
-    if exist_user(conn, &new_user.email) {
+    if exist_user(&new_user.email) {
         return Err(CreationError::UserAlreadyExists(
             "User already exists.".to_string(),
         ));
@@ -78,6 +81,6 @@ fn validate_email(e_mail: &str) -> bool {
     is_email.is_match(e_mail)
 }
 
-fn exist_user(conn: &mut PgConnection, e_mail: &str) -> bool {
-    read_user::find(conn, e_mail).is_some()
+fn exist_user(e_mail: &str) -> bool {
+    read_user::find(e_mail).is_some()
 }

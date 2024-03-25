@@ -1,8 +1,11 @@
 use crate::models::{AuthUser, User};
 use crate::schema::users::dsl::*;
 use diesel::prelude::*;
+use crate::connection;
 
-pub fn find(conn: &mut PgConnection, e_mail: &str) -> Option<User> {
+pub fn find(e_mail: &str) -> Option<User> {
+    let conn = &mut connection::establish_connection();
+
     match users
         .select(User::as_select())
         .filter(email.eq(e_mail))
@@ -13,7 +16,9 @@ pub fn find(conn: &mut PgConnection, e_mail: &str) -> Option<User> {
     }
 }
 
-pub fn find_for_auth(conn: &mut PgConnection, e_mail: &str) -> Option<AuthUser> {
+pub fn find_for_auth(e_mail: &str) -> Option<AuthUser> {
+    let conn = &mut connection::establish_connection();
+
     match users
         .select(AuthUser::as_select())
         .filter(email.eq(e_mail))

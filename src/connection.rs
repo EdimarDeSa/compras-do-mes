@@ -1,8 +1,7 @@
 use diesel::prelude::*;
+use dotenv;
 
 pub fn establish_connection() -> PgConnection {
-    dotenv::dotenv().ok();
-
     let db_user = dotenv::var("DB_USER").unwrap();
     let db_pass = dotenv::var("DB_PASS").unwrap();
     let db_ip = dotenv::var("DB_IP").unwrap();

@@ -1,7 +1,7 @@
 use diesel::prelude::*;
 use dotenv;
 
-use crate::constants::constants::{DB_IP, DB_NAME, DB_PASS, DB_PORT, DB_USER};
+use crate::constants::{DB_IP, DB_NAME, DB_PASS, DB_PORT, DB_USER};
 
 pub fn establish_connection() -> PgConnection {
     let db_user = dotenv::var(DB_USER).unwrap();

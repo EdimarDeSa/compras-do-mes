@@ -3,7 +3,6 @@
 use axum::{routing::get, Router};
 use chrono::prelude::*;
 use diesel::prelude::*;
-use dotenv;
 use std::process::exit;
 
 use compras_do_mes::connection;

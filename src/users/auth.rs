@@ -6,7 +6,7 @@ use serde::Serialize;
 use sha2::Sha256;
 use std::collections::BTreeMap;
 
-use crate::constants::constants::{ID, JWT_SECRET};
+use crate::constants::{ID, JWT_SECRET};
 use crate::users::read_user;
 
 #[derive(Debug)]

@@ -27,7 +27,7 @@ async fn main() {
         Err(e) => println!("Erro ao criar usuário: {:?}", e),
     };
 
-    let user = read_user::find(&email).unwrap();
+    let user = read_user::find_with_email(&email).unwrap();
     println!("Usuário encontrado: {:?}", user);
 
     let token = auth::login(&new_user.email, &new_user.password).unwrap();
@@ -46,7 +46,7 @@ async fn main() {
     let altered = update_user::update(alter_user).unwrap();
     println!("Usuário alterado: {:?}", altered);
 
-    let user = read_user::find(&email).unwrap();
+    let user = read_user::find_with_email(&email).unwrap();
     println!("Usuário encontrado: {:?}", user);
 
     let deletion = delete_user::remove(&user.id);

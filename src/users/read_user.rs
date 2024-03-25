@@ -4,7 +4,7 @@ use crate::users::user_models::{AuthUser, User};
 use diesel::prelude::*;
 use uuid::Uuid;
 
-pub fn find(e_mail: &str) -> Option<User> {
+pub fn find_with_email(e_mail: &str) -> Option<User> {
     let conn = &mut connection::establish_connection();
 
     match users

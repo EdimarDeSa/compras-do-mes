@@ -59,6 +59,8 @@ fn validate_user_data(new_user: &NewUser) -> Result<(), CreationError> {
     if let Err(e) = exist_user(&new_user.email) {
         return Err(e);
     }
+    
+    Ok(())
 }
 
 fn validate_password(password: &str) -> Result<(), CreationError> {
@@ -137,7 +139,7 @@ fn validate_email(e_mail: &str) -> Result<(), CreationError> {
 }
 
 fn exist_user(e_mail: &str) -> Result<(), CreationError> {
-    if read_user::find(e_mail).is_some() {
+    if read_user::find_with_email(e_mail).is_some() {
         return Err(CreationError::UserAlreadyExists);
     }
     Ok(())

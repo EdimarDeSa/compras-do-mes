@@ -42,7 +42,7 @@ pub fn login(auth: Auth) -> Result<Token, AuthError> {
     }
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Token {
     pub token: String,
 }

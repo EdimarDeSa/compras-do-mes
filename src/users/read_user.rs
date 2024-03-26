@@ -1,9 +1,11 @@
 use diesel::prelude::*;
 use uuid::Uuid;
 
-use crate::connection;
-use crate::schema::users::dsl::*;
-use crate::users::user_models::{AuthUser, User};
+use crate::{
+    connection,
+    schema::users::dsl::*,
+    users::user_models::{AuthUser, User},
+};
 
 pub fn find_with_email(e_mail: &str) -> Option<User> {
     let conn = &mut connection::establish_connection();
@@ -14,7 +16,7 @@ pub fn find_with_email(e_mail: &str) -> Option<User> {
         .first(conn)
     {
         Ok(user) => Some(user),
-        Err(_) => None,
+        Err(_) => None
     }
 }
 

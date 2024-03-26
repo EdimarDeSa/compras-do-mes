@@ -15,15 +15,14 @@ impl From<diesel::result::Error> for DeletionError {
     }
 }
 
-
 pub fn remove(_id: &Uuid) -> Result<usize, DeletionError> {
     let conn = &mut connection::establish_connection();
 
-    conn.transaction::<_, DeletionError, _>(|conn| {
-        if read_user::find_with_id(_id).is_none() {
-            return Err(DeletionError::UserNotFound);
-        }
+    if read_user::find_with_id(_id).is_none() {
+        return Err(DeletionError::UserNotFound);
+    }
 
+    conn.transaction::<_, DeletionError, _>(|conn| {
         match diesel::delete(users.filter(id.eq(_id))).execute(conn) {
             Ok(count) => Ok(count),
             Err(e) => Err(DeletionError::TransactionError(e.to_string())),

@@ -26,29 +26,21 @@ pub mod constants {
     pub const BIRTH_DATE_FORMAT: &str = "%Y-%m-%d";
 
     pub const RULES: [(&str, &str); 5] = [
-        (
-            r"[a-z]",
-            "Password must be at last one lowercase letter",
-        ),
-        (
-            r"[A-Z]",
-            "Password must be at last one uppercase letter",
-        ),
+        (r"[a-z]", "Password must be at last one lowercase letter"),
+        (r"[A-Z]", "Password must be at last one uppercase letter"),
         (r"\d", "Password must be at last one digit"),
         (
             r"[@$!%*?&]",
             "Password must be at last one special character -> (@$!%*?&)",
         ),
-        (
-            r".{8,}",
-            "Password must be at least 8 characters long",
-        ),
+        (r".{8,}", "Password must be at least 8 characters long"),
     ];
 }
 
 pub mod validators {
-    use regex::Regex;
     use crate::constants::RULES;
+    use regex::Regex;
+    use std::fmt::Display;
 
     #[derive(Debug)]
     pub enum PasswordErrors {
@@ -57,16 +49,15 @@ pub mod validators {
         RegexError(String),
     }
 
-    impl PasswordErrors {
-        pub fn to_string(&self) -> String {
+    impl Display for PasswordErrors {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             match self {
-                PasswordErrors::EmptyPassword => "Password cannot be empty".to_string(),
-                PasswordErrors::InvalidPassword(e) => e.to_string(),
-                PasswordErrors::RegexError(e) => e.to_string(),
+                PasswordErrors::EmptyPassword => write!(f, "Password cannot be empty"),
+                PasswordErrors::InvalidPassword(e) => write!(f, "{e}"),
+                PasswordErrors::RegexError(e) => write!(f, "{e}"),
             }
         }
     }
-
 
     pub fn validate_password(password: &str) -> Result<(), PasswordErrors> {
         if password.is_empty() {
@@ -87,21 +78,21 @@ pub mod validators {
         Ok(())
     }
 
-
     #[derive(Debug)]
-    pub enum EmailErrors {InvalidEmail,
+    pub enum EmailErrors {
+        InvalidEmail,
         RegexError(String),
     }
 
-    impl EmailErrors {
-        pub fn to_string(&self) -> String {
+
+    impl Display for EmailErrors {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             match self {
-                EmailErrors::InvalidEmail => "Invalid e-mail format.".to_string(),
-                EmailErrors::RegexError(e) => e.to_string(),
+                EmailErrors::InvalidEmail => write!(f, "Invalid e-mail format."),
+                EmailErrors::RegexError(e) => write!(f, "{e}"),
             }
         }
     }
-
 
     pub fn validate_email(e_mail: &str) -> Result<(), EmailErrors> {
         match Regex::new(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$") {
@@ -115,5 +106,9 @@ pub mod validators {
 
         Ok(())
     }
+}
 
+#[cfg(test)]
+mod tests {
+    mod test_users;
 }

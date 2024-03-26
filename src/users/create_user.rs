@@ -6,7 +6,7 @@ use crate::{
     schema::users,
     users::read_user,
     users::user_models::{FullUser, NewUser, User},
-    validators::{validate_password, validate_email}
+    validators::{validate_email, validate_password},
 };
 
 #[derive(Debug)]
@@ -25,14 +25,9 @@ impl From<diesel::result::Error> for CreationError {
 }
 
 pub fn new(new_user: &NewUser) -> Result<User, CreationError> {
-    if let Err(e) = validate_user_data(&new_user) {
-        return Err(e);
-    }
+    validate_user_data(new_user)?;
 
-    let full_user = match create_full_user(new_user) {
-        Ok(u) => u,
-        Err(e) => return Err(e),
-    };
+    let full_user = create_full_user(new_user)?;
 
     let conn = &mut connection::establish_connection();
     conn.transaction::<_, CreationError, _>(|conn| {
@@ -56,13 +51,10 @@ fn validate_user_data(new_user: &NewUser) -> Result<(), CreationError> {
         return Err(CreationError::InvalidEmail(e.to_string()));
     }
 
-    if let Err(e) = exist_user(&new_user.email) {
-        return Err(e);
-    }
+    exist_user(&new_user.email)?;
 
     Ok(())
 }
-
 
 fn exist_user(e_mail: &str) -> Result<(), CreationError> {
     if read_user::find_with_email(e_mail).is_some() {
@@ -70,7 +62,6 @@ fn exist_user(e_mail: &str) -> Result<(), CreationError> {
     }
     Ok(())
 }
-
 
 fn create_full_user(new_user: &NewUser) -> Result<FullUser, CreationError> {
     let mut full_user = FullUser::new(new_user);

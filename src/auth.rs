@@ -6,23 +6,30 @@ use serde::Serialize;
 use sha2::Sha256;
 use std::collections::BTreeMap;
 
-use crate::constants::{ID, JWT_SECRET};
-use crate::users::read_user;
+use crate::{
+    constants::{ID, JWT_SECRET},
+    users::read_user,
+};
 
 #[derive(Debug)]
 pub enum AuthError {
     InvalidPassword,
     UserNotFound,
+    DecodeError(String),
 }
 
 pub fn login(email: &str, password: &str) -> Result<Token, AuthError> {
     if let Some(user) = read_user::find_for_auth(email) {
-        if !bcrypt::verify(password, &user.password).unwrap() {
-            return Err(AuthError::InvalidPassword);
+        match bcrypt::verify(password, &user.password) {
+            Ok(v) => {
+                if !v {
+                    return Err(AuthError::InvalidPassword);
+                }
+            }
+            Err(e) => return Err(AuthError::DecodeError(e.to_string())),
         }
 
-        let token = generate_jwt_token(&user.id.to_string());
-        Ok(token)
+        Ok(generate_jwt_token(&user.id.to_string()))
     } else {
         Err(AuthError::UserNotFound)
     }

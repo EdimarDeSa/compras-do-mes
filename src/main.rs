@@ -1,7 +1,7 @@
 use axum::Router;
 
-use compras_do_mes::users;
 use compras_do_mes::auth;
+use compras_do_mes::users;
 
 #[tokio::main]
 async fn main() {

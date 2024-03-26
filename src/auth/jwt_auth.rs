@@ -22,7 +22,7 @@ pub enum AuthError {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Auth {
     email: String,
-    password: String
+    password: String,
 }
 
 pub fn login(auth: Auth) -> Result<Token, AuthError> {
@@ -63,7 +63,10 @@ fn generate_jwt_token(id: &str) -> Token {
     claims.insert(ID.to_string(), id.to_string());
 
     let token_str = claims.sign_with_key(&key).unwrap();
-    Token { token: token_str, id: id.to_string() }
+    Token {
+        token: token_str,
+        id: id.to_string(),
+    }
 }
 
 pub fn check_jwt_token(token_str: &str, id: &str) -> bool {

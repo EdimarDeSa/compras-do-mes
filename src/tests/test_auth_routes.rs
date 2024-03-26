@@ -1,14 +1,14 @@
-use std::sync::{Mutex};
+use crate::auth::jwt_auth::Token;
 use axum_test::http::{header, StatusCode};
 use axum_test::TestServer;
-use serde_json::{json};
-use crate::auth::jwt_auth::Token;
+use serde_json::json;
+use std::sync::Mutex;
 
 use crate::auth::urls::create_routes;
 
 static JWT_INFO: Mutex<Option<Token>> = Mutex::new(None);
 
-static URL:&str = "/login";
+static URL: &str = "/login";
 
 fn setup_test_server() -> TestServer {
     TestServer::new(create_routes()).unwrap()
@@ -46,8 +46,12 @@ async fn test_authentication_with_jwt() {
 
     let url = String::from_iter([URL, "/jwt"]);
 
-    let response = setup_test_server().post(&url)
-        .add_header(header::AUTHORIZATION, format!("Bearer {}", token.token).parse().unwrap())
+    let response = setup_test_server()
+        .post(&url)
+        .add_header(
+            header::AUTHORIZATION,
+            format!("Bearer {}", token.token).parse().unwrap(),
+        )
         .json(&json_)
         .await;
 

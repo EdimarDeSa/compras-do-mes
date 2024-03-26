@@ -53,8 +53,6 @@ async fn create(new_user: Json<NewUser>) -> (StatusCode, Json<Value>) {
     }
 }
 
-
 pub fn create_routes() -> Router {
-    Router::new()
-        .route("/create", post(create))
+    Router::new().route("/create", post(create))
 }

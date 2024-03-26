@@ -15,13 +15,7 @@ struct ErrorResponse {
 async fn post_login(auth: Json<Auth>) -> (StatusCode, Json<Value>) {
     match login(auth.0) {
         Ok(token) => {
-            let body = Json(json!(token));
-            let mut response = Response::new(body);
-            response.headers_mut().insert(
-                header::AUTHORIZATION,
-                format!("Bearer {}", token).parse().unwrap(),
-            );
-            (StatusCode::OK, response.into_body())
+            (StatusCode::OK, Json(json!(token)))
         },
         Err(e) => {
             match e {

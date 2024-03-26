@@ -1,7 +1,7 @@
 use std::sync::{Mutex};
 use axum_test::http::{header, StatusCode};
 use axum_test::TestServer;
-use serde_json::{json, Value};
+use serde_json::{json};
 use crate::auth::jwt_auth::Token;
 
 use crate::auth::urls::create_routes;

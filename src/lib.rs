@@ -2,13 +2,17 @@ pub mod schema;
 
 pub mod connection;
 
-pub mod auth;
+pub mod auth {
+    pub mod jwt_auth;
+    pub mod urls;
+}
 
 pub mod users {
     pub mod create_user;
     pub mod delete_user;
     pub mod read_user;
     pub mod update_user;
+    pub mod urls;
     pub mod user_models;
 }
 
@@ -110,4 +114,5 @@ pub mod validators {
 #[cfg(test)]
 mod tests {
     mod test_users;
+    mod test_auth_routes;
 }

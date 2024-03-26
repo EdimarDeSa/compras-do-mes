@@ -1,21 +1,15 @@
-use std::collections::HashMap;
-use chrono::NaiveDate;
 use crate::auth;
 use crate::auth::check_jwt_token;
 use crate::constants::*;
-use crate::users::{
-    user_models::*,
-    *
-};
-
+use crate::users::{user_models::*, *};
+use chrono::NaiveDate;
+use std::collections::HashMap;
 
 const INITIAL_EMAIL: &str = "email_super.criativo@queemail.com";
 const NEW_EMAIL: &str = "email@khyyuyu.com";
 const INITIAL_PASSWORD: &str = "Senh@Mu1toF0rt3";
 const INITIAL_NAME: &str = "Fulanisson de Teste";
 const NEW_NAME: &str = "Fulanisson de Teste Alterado";
-
-
 
 #[test]
 fn test_1_create_user_success() {
@@ -49,19 +43,18 @@ fn test_3_read_user() {
 
     assert_eq!(user.nickname, INITIAL_NAME.to_string());
     assert_eq!(user.email, email);
-    assert_eq!(user.birth_date, Some(NaiveDate::parse_from_str("1995-09-04", BIRTH_DATE_FORMAT).unwrap()));
+    assert_eq!(
+        user.birth_date,
+        Some(NaiveDate::parse_from_str("1995-09-04", BIRTH_DATE_FORMAT).unwrap())
+    );
 }
-
 
 #[test]
 fn test_4_update_user() {
     let user = read_user::find_with_email(INITIAL_EMAIL).unwrap();
 
     let mut changes = HashMap::new();
-    changes.insert(
-        "nickname".to_string(),
-        NEW_NAME.to_string(),
-    );
+    changes.insert("nickname".to_string(), NEW_NAME.to_string());
     changes.insert("email".to_string(), NEW_EMAIL.to_string());
 
     let alter_user = AlterUser {

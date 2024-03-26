@@ -16,7 +16,7 @@ pub fn find_with_email(e_mail: &str) -> Option<User> {
         .first(conn)
     {
         Ok(user) => Some(user),
-        Err(_) => None
+        Err(_) => None,
     }
 }
 

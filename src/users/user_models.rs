@@ -1,5 +1,6 @@
 use chrono::{NaiveDate, NaiveDateTime, Utc};
 use diesel::prelude::*;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use uuid::Uuid;
 
@@ -40,7 +41,7 @@ impl Default for FullUser {
     }
 }
 
-#[derive(Queryable, Selectable, Debug)]
+#[derive(Queryable, Selectable, Debug, Serialize)]
 #[diesel(table_name = crate::schema::users)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct User {
@@ -51,7 +52,7 @@ pub struct User {
     pub created_at: NaiveDateTime,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct NewUser {
     pub nickname: String,
     pub email: String,

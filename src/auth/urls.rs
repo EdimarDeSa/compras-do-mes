@@ -1,7 +1,6 @@
-use axum::{Json, Router, routing::{get, post}};
-use axum::http::{header, HeaderMap, StatusCode, Response};
-use axum::response::IntoResponse;
-use serde::Serialize;
+use axum::{Json, Router, routing::post};
+use axum::http::{HeaderMap, StatusCode};
+use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
 use super::jwt_auth::*;
@@ -45,16 +44,29 @@ async fn post_login(auth: Json<Auth>) -> (StatusCode, Json<Value>) {
     }
 }
 
-async fn get_login(header_map: HeaderMap) -> impl IntoResponse {
-    println!("{:?}", header_map);
-    // check_jwt_token()
-    StatusCode::OK
+#[derive(Serialize, Deserialize)]
+struct JsonResponse {
+    id: String
+}
+
+async fn get_login(header_map: HeaderMap, json: Json<JsonResponse>) -> StatusCode {
+    let token = match header_map.get("Authorization") {
+        Some(auth) => {
+            let auth = auth.to_str().unwrap();
+            auth.split_whitespace().nth(1).unwrap()
+        },
+        None => return StatusCode::NETWORK_AUTHENTICATION_REQUIRED
+    };
+
+    if !check_jwt_token(token, &json.id) {
+        return StatusCode::UNAUTHORIZED;
+    };
+
+    StatusCode::ACCEPTED
 }
 
 pub fn create_routes() -> Router {
-    let routes = Router::new()
+    Router::new()
         .route("/login", post(post_login))
-        .route("/login", get(get_login));
-
-    routes
+        .route("/login/jwt", post(get_login))
 }

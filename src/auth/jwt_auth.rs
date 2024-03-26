@@ -42,9 +42,10 @@ pub fn login(auth: Auth) -> Result<Token, AuthError> {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Token {
     pub token: String,
+    pub id: String,
 }
 
 impl Display for Token {
@@ -62,7 +63,7 @@ fn generate_jwt_token(id: &str) -> Token {
     claims.insert(ID.to_string(), id.to_string());
 
     let token_str = claims.sign_with_key(&key).unwrap();
-    Token { token: token_str }
+    Token { token: token_str, id: id.to_string() }
 }
 
 pub fn check_jwt_token(token_str: &str, id: &str) -> bool {

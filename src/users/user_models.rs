@@ -68,7 +68,7 @@ pub struct AuthUser {
     pub password: String,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AlterUser {
     pub id: Uuid,
     pub changes: HashMap<String, String>,

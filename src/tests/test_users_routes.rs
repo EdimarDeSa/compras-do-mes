@@ -13,7 +13,7 @@ fn setup_test_server() -> TestServer {
 static LITE_DB: Mutex<Option<User>> = Mutex::new(None);
 
 #[tokio::test]
-async fn test_create_user_success_without_birth_date() {
+async fn test_1_create_user_success_without_birth_date() {
     let new_user = NewUser {
         nickname: "Testulino da Silva Testes".to_string(),
         email: "email_super_criativo_pakas@email.com".to_string(),
@@ -32,7 +32,31 @@ async fn test_create_user_success_without_birth_date() {
 }
 
 #[tokio::test]
-async fn test_delete_user() {
+async fn test_2_get_user_with_email() {
+    let user = LITE_DB.lock().unwrap().clone().unwrap();
+
+    let response = setup_test_server()
+        .get(&format!("/search/email/{}", user.email))
+        .await;
+
+    response.assert_status(StatusCode::FOUND);
+    response.assert_json(&json!(user))
+}
+
+#[tokio::test]
+async fn test_3_get_user_with_id() {
+    let user = LITE_DB.lock().unwrap().clone().unwrap();
+
+    let response = setup_test_server()
+        .get(&format!("/search/id/{}", user.id))
+        .await;
+
+    response.assert_status(StatusCode::FOUND);
+    response.assert_json(&json!(user))
+}
+
+#[tokio::test]
+async fn test_4_delete_user() {
     let id = LITE_DB.lock().unwrap().clone().unwrap().id;
 
     let response = setup_test_server().delete(&format!("/delete/{id}")).await;

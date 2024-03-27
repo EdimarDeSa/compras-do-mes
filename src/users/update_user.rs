@@ -1,5 +1,6 @@
 use chrono::NaiveDate;
 use diesel::prelude::*;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     connection,
@@ -26,7 +27,7 @@ impl From<diesel::result::Error> for UpdateError {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct UpdateInfo {
     pub nickname: Option<String>,
     pub email: Option<String>,
@@ -34,7 +35,7 @@ pub struct UpdateInfo {
     pub birth_date: Option<String>,
 }
 
-pub fn update(new_user: AlterUser) -> Result<UpdateInfo, UpdateError> {
+pub fn update(new_user: &AlterUser) -> Result<UpdateInfo, UpdateError> {
     if read_user::find_with_id(&new_user.id).is_none() {
         return Err(UpdateError::UserNotFound);
     };
@@ -44,7 +45,7 @@ pub fn update(new_user: AlterUser) -> Result<UpdateInfo, UpdateError> {
     let conn = &mut connection::establish_connection();
 
     conn.transaction::<_, UpdateError, _>(|conn| {
-        for (field, value) in new_user.changes {
+        for (field, value) in new_user.changes.clone() {
             match field.to_lowercase().as_str() {
                 "nickname" => {
                     diesel::update(users.filter(id.eq(&new_user.id)))

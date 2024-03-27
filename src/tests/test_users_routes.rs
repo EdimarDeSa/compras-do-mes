@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use axum_test::http::StatusCode;
 use axum_test::TestServer;
 use serde_json::json;
@@ -56,7 +57,31 @@ async fn test_3_get_user_with_id() {
 }
 
 #[tokio::test]
-async fn test_4_delete_user() {
+async fn test_4_update_user() {
+    let user = LITE_DB.lock().unwrap().clone().unwrap();
+
+    let new_nick = "Testulino da Silva Testes dos testantes".to_string();
+
+    let mut changes = HashMap::new();
+    changes.insert("nickname".to_string(), Some(new_nick.clone()));
+    changes.insert("birth_date".to_string(), None);
+    changes.insert("email".to_string(), None);
+    changes.insert("password".to_string(), None);
+
+    let response = setup_test_server()
+        .put("/update")
+        .json(&json!({
+        "id": user.id,
+        "changes": {"nickname": new_nick}
+    }))
+        .await;
+
+    response.assert_status(StatusCode::OK);
+    response.assert_json(&json!(changes))
+}
+
+#[tokio::test]
+async fn test_5_delete_user() {
     let id = LITE_DB.lock().unwrap().clone().unwrap().id;
 
     let response = setup_test_server().delete(&format!("/delete/{id}")).await;

@@ -1,7 +1,7 @@
-use std::sync::Mutex;
 use axum_test::http::StatusCode;
 use axum_test::TestServer;
 use serde_json::json;
+use std::sync::Mutex;
 
 use crate::users::urls::create_routes;
 use crate::users::user_models::{NewUser, User};
@@ -18,7 +18,7 @@ async fn test_1_create_user_success_without_birth_date() {
         nickname: "Testulino da Silva Testes".to_string(),
         email: "email_super_criativo_pakas@email.com".to_string(),
         password: "S3nh@Mu1t0Gr@nd3".to_string(),
-        birth_date: None
+        birth_date: None,
     };
 
     let response = setup_test_server()

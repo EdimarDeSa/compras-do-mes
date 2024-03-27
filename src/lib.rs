@@ -114,4 +114,5 @@ pub mod validators {
 #[cfg(test)]
 mod tests {
     mod test_auth_routes;
+    mod test_users_routes;
 }

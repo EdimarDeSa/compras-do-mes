@@ -1,8 +1,10 @@
-use axum::{http::StatusCode, routing::post, Json, Router};
+use axum::{http::StatusCode, routing::{post, delete}, Json, Router, extract::Path};
 use serde::Serialize;
 use serde_json::{json, Value};
+use uuid::Uuid;
 
 use crate::users::{create_user, create_user::CreationError, user_models::NewUser};
+use crate::users::{delete_user, delete_user::DeletionError};
 
 #[derive(Debug, Serialize)]
 struct ErrorResponse {
@@ -53,6 +55,30 @@ async fn create(new_user: Json<NewUser>) -> (StatusCode, Json<Value>) {
     }
 }
 
+async fn remove(user_id: Path<Uuid>) -> (StatusCode, Json<Value>) {
+    match delete_user::remove(&user_id) {
+        Ok(u) => (StatusCode::OK, Json(json!({"removals": u}))),
+        Err(e) => match e {
+            DeletionError::UserNotFound => {
+                let err = ErrorResponse {
+                    error: "UserNotFound".to_string(),
+                    msg: "User not found".to_string(),
+                };
+                (StatusCode::NOT_FOUND, Json(json!(err)))
+            },
+            DeletionError::TransactionError(e) => {
+                let err = ErrorResponse {
+                    error: "TransactionError".to_string(),
+                    msg: e,
+                };
+                (StatusCode::INTERNAL_SERVER_ERROR, Json(json!(err)))
+            }
+        },
+    }
+}
+
 pub fn create_routes() -> Router {
-    Router::new().route("/create", post(create))
+    Router::new()
+        .route("/create", post(create))
+        .route("/delete/:user_id", delete(remove))
 }

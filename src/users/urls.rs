@@ -1,10 +1,11 @@
-use axum::{http::StatusCode, routing::{post, delete}, Json, Router, extract::Path};
+use axum::{http::StatusCode, routing::{post, delete, get}, Json, Router, extract::Path};
 use serde::Serialize;
 use serde_json::{json, Value};
 use uuid::Uuid;
 
 use crate::users::{create_user, create_user::CreationError, user_models::NewUser};
 use crate::users::{delete_user, delete_user::DeletionError};
+use crate::users::{read_user};
 
 #[derive(Debug, Serialize)]
 struct ErrorResponse {
@@ -77,8 +78,36 @@ async fn remove(user_id: Path<Uuid>) -> (StatusCode, Json<Value>) {
     }
 }
 
+async fn get_user_with_email(email: Path<String>) -> (StatusCode, Json<Value>) {
+    match read_user::find_with_email(&email) {
+        Some(u) => (StatusCode::FOUND, Json(json!(u))),
+        None => {
+            let msg = json!(ErrorResponse {
+                error: "UserNotFound".to_string(),
+                msg: "User not found".to_string()
+            });
+            (StatusCode::NOT_FOUND, Json(msg))
+        }
+    }
+}
+
+async fn get_user_with_id(id: Path<Uuid>) -> (StatusCode, Json<Value>) {
+    match read_user::find_with_id(&id) {
+        Some(u) => (StatusCode::FOUND, Json(json!(u))),
+        None => {
+            let msg = json!(ErrorResponse {
+                error: "UserNotFound".to_string(),
+                msg: "User not found".to_string()
+            });
+            (StatusCode::NOT_FOUND, Json(msg))
+        }
+    }
+}
+
 pub fn create_routes() -> Router {
     Router::new()
         .route("/create", post(create))
         .route("/delete/:user_id", delete(remove))
+        .route("/search/email/:email", get(get_user_with_email))
+        .route("/search/id/:id", get(get_user_with_id))
 }

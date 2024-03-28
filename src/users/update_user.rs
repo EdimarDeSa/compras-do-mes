@@ -6,7 +6,8 @@ use crate::{
     connection,
     constants::BIRTH_DATE_FORMAT,
     schema::users::dsl::*,
-    users::{read_user, user_models::AlterUser},
+    users::read_user,
+    models::user::{AlterUser},
     validators,
 };
 

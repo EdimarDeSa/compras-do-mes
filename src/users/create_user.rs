@@ -5,7 +5,7 @@ use crate::{
     connection,
     schema::users,
     users::read_user,
-    users::user_models::{FullUser, NewUser, User},
+    models::user::{User, NewUser, PartialUser},
     validators::{validate_email, validate_password},
 };
 
@@ -24,7 +24,7 @@ impl From<diesel::result::Error> for CreationError {
     }
 }
 
-pub fn new(new_user: &NewUser) -> Result<User, CreationError> {
+pub fn new(new_user: &NewUser) -> Result<PartialUser, CreationError> {
     validate_user_data(new_user)?;
 
     let full_user = create_full_user(new_user)?;
@@ -33,7 +33,7 @@ pub fn new(new_user: &NewUser) -> Result<User, CreationError> {
     conn.transaction::<_, CreationError, _>(|conn| {
         match insert_into(users::table)
             .values(full_user)
-            .returning(User::as_returning())
+            .returning(PartialUser::as_returning())
             .get_result(conn)
         {
             Ok(user) => Ok(user),
@@ -63,8 +63,8 @@ fn exist_user(e_mail: &str) -> Result<(), CreationError> {
     Ok(())
 }
 
-fn create_full_user(new_user: &NewUser) -> Result<FullUser, CreationError> {
-    let mut full_user = FullUser::new(new_user);
+fn create_full_user(new_user: &NewUser) -> Result<User, CreationError> {
+    let mut full_user = User::new(new_user);
 
     match bcrypt::hash(&full_user.password, bcrypt::DEFAULT_COST) {
         Ok(hashed_password) => {

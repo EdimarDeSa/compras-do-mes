@@ -4,14 +4,14 @@ use uuid::Uuid;
 use crate::{
     connection,
     schema::users::dsl::*,
-    users::user_models::{AuthUser, User},
+    models::user::{AuthUser, PartialUser},
 };
 
-pub fn find_with_email(e_mail: &str) -> Option<User> {
+pub fn find_with_email(e_mail: &str) -> Option<PartialUser> {
     let conn = &mut connection::establish_connection();
 
     match users
-        .select(User::as_select())
+        .select(PartialUser::as_select())
         .filter(email.eq(e_mail))
         .first(conn)
     {
@@ -20,11 +20,11 @@ pub fn find_with_email(e_mail: &str) -> Option<User> {
     }
 }
 
-pub fn find_with_id(_id: &Uuid) -> Option<User> {
+pub fn find_with_id(_id: &Uuid) -> Option<PartialUser> {
     let conn = &mut connection::establish_connection();
 
     match users
-        .select(User::as_select())
+        .select(PartialUser::as_select())
         .filter(id.eq(_id))
         .first(conn)
     {

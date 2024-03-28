@@ -10,11 +10,11 @@ use uuid::Uuid;
 
 use crate::users::{
     read_user,
-    {create_user, create_user::CreationError, user_models::NewUser},
+    {create_user, create_user::CreationError},
     {delete_user, delete_user::DeletionError},
-    {update_user, update_user::UpdateError}
+    {update_user, update_user::UpdateError},
 };
-use crate::users::user_models::AlterUser;
+use crate::models::user::{AlterUser, NewUser};
 
 #[derive(Debug, Serialize)]
 struct ErrorResponse {

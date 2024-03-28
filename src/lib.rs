@@ -7,13 +7,26 @@ pub mod auth {
     pub mod urls;
 }
 
+pub mod models {
+    pub mod default_categorys;
+    pub mod unity_types;
+    pub mod default_products;
+    pub mod market;
+    pub mod product_list;
+    pub mod shopping_list;
+    pub mod shopping_log;
+    pub mod user_categorys;
+    pub mod user_products;
+    pub mod user;
+}
+
+
 pub mod users {
     pub mod create_user;
     pub mod delete_user;
     pub mod read_user;
     pub mod update_user;
     pub mod urls;
-    pub mod user_models;
 }
 
 pub mod constants {

@@ -5,7 +5,7 @@ use serde_json::json;
 use std::sync::Mutex;
 
 use crate::users::urls::create_routes;
-use crate::users::user_models::{NewUser, User};
+use crate::models::user::{NewUser, User};
 
 fn setup_test_server() -> TestServer {
     TestServer::new(create_routes()).unwrap()

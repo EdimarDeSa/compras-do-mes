@@ -29,9 +29,10 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_filters",
     "rest_framework",
     "rest_framework.authtoken",
-    "django_filters",
+    "djoser",
     "lista_de_compras.apps.ListaDeComprasConfig",
 ]
 
@@ -66,17 +67,16 @@ TEMPLATES = [
 WSGI_APPLICATION = "setup.wsgi.application"
 
 
-# Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
+# Database settings
 
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        'NAME': environ.get('POSTGRES_NAME'),
-        'USER': environ.get('POSTGRES_USER'),
-        'PASSWORD': environ.get('POSTGRES_PASSWORD'),
-        'HOST': 'postgres',
-        'PORT': 5432,
+        "NAME": environ.get("POSTGRES_DB"),
+        "USER": environ.get("POSTGRES_USER"),
+        "PASSWORD": environ.get("POSTGRES_PW"),
+        "HOST": "postgres",
+        "PORT": 5432,
     }
 }
 
@@ -99,6 +99,17 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+PASSWORD_HASHERS = ["django.contrib.auth.hashers.BCryptPasswordHasher"]
+
+AUTH_USER_MODEL = "lista_de_compras.Users"
+
+DJOSER = {
+    "SERIALIZERS": {
+        "user_create": "lista_de_compras.serializers.UsersSerializer",
+    },
+    "USER_CREATE_PASSWORD_RETYPE": True,
+    "LOGOUT_ON_PASSWORD_CHANGE": True,
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
@@ -133,14 +144,11 @@ REST_FRAMEWORK = {
     "PERMISSON_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
-    'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.AnonRateThrottle',
-        'rest_framework.throttling.UserRateThrottle'
-    ],
-    'DEFAULT_THROTTLE_RATES': {
-        'anon': '50/day',
-        'user': '50/minute'
-    },
+    # "DEFAULT_THROTTLE_CLASSES": [
+    #     "rest_framework.throttling.AnonRateThrottle",
+    #     "rest_framework.throttling.UserRateThrottle",
+    # ],
+    # "DEFAULT_THROTTLE_RATES": {"anon": "50/day", "user": "50/minute"},
     "DEFAULT_FILTER_BACKENDS": [
         "django_filters.rest_framework.DjangoFilterBackend",
         "rest_framework.filters.SearchFilter",

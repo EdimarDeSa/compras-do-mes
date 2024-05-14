@@ -221,3 +221,6 @@ rust-project.json
 
 ### NeoVim ###
 tags
+
+### Custom ###
+*.sql

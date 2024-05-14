@@ -1,7 +1,19 @@
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
 
-from .models import DefaultCategorys, DefaultProducts, UnityTypes
+from .models import DefaultCategorys, DefaultProducts, UnityTypes, Users
+
+
+@receiver(post_migrate)
+def create_default_categorys(sender, **kwargs):
+    if sender.label == "lista_de_compras":
+        if Users.objects.all().count() == 0:
+            Users.objects.create_superuser(
+                username="admin",
+                password="admin",
+                email="admin@efscode.com.br",
+                nickname="admin",
+            )
 
 
 @receiver(post_migrate)

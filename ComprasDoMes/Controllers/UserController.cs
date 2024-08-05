@@ -56,6 +56,14 @@ public class UserController : ControllerBase
         PasswordExceptions passwordExceptions = UserValidations.ValidatePassword(userDTO.Password, "");
         if(!passwordExceptions.IsValid()) return BadRequest(passwordExceptions.ToString());
 
+        var existsId = await _dbConn.Users.FindAsync(userDTO.Id);
+
+        if (existsId != null) return BadRequest("User id already exists!");
+
+        var existsEmail = await _dbConn.Users.Where(u => u.Email == userDTO.Email).FirstOrDefaultAsync();
+
+        if (existsEmail != null) return BadRequest("Email in use!");
+
         User user = new User
         {
             Id = userDTO.Id,
@@ -63,7 +71,7 @@ public class UserController : ControllerBase
             FirstName = userDTO.FirstName,
             LastName = userDTO.LastName,
             Email = userDTO.Email,
-            Birthdate = userDTO.BirthDate,
+            Birthdate = userDTO.Birthdate,
         };
         user.SetPassword(userDTO.Password);
 
@@ -76,7 +84,38 @@ public class UserController : ControllerBase
             UserToDTO(user)
         );
     }
-    
+
+    [HttpPatch("update/email/{id}")]
+    public async Task<ActionResult<UserDTO>> UpdateUserEmail(string id, [FromBody] UserEmailDTO updateUserEmailDTO)
+    {
+        EmailExceptions emailExceptions = UserValidations.ValidateEmail(updateUserEmailDTO.Email, "");
+        if( !emailExceptions.IsValid() ) return BadRequest(emailExceptions.ToString());
+
+        var user =  await _dbConn.Users.FindAsync(id);
+
+        if (user == null) return NotFound();
+
+        user.Email = updateUserEmailDTO.Email;
+
+        await _dbConn.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+    [HttpPatch("update/birthdate/{id}")]
+    public async Task<ActionResult<UserDTO>> UpdateUserBirthDate(string id, [FromBody] UserBirthdateDTO updateUserBirthdateDTO)
+    {
+        var user =  await _dbConn.Users.FindAsync(id);
+
+        if (user == null) return NotFound();
+
+        user.Birthdate = updateUserBirthdateDTO.Birthdate;
+
+        await _dbConn.SaveChangesAsync();
+
+        return NoContent();
+    }
+
     public static UserDTO UserToDTO(User user) =>
        new UserDTO
        {
@@ -86,6 +125,6 @@ public class UserController : ControllerBase
            FirstName = user.FirstName,
            LastName = user.LastName,
            Email = user.Email,
-           BirthDate = user.Birthdate,
+           Birthdate = user.Birthdate,
        };
 }

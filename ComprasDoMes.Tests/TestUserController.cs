@@ -44,7 +44,7 @@ public class UserControllerTests
                 FirstName = "Edimar",
                 LastName = "Freitas",
                 Email = "Edimar@email.com",
-                Password = "Str1ng@_s213123",
+                Password = "Str1ng@s213123",
                 BirthDate = new DateOnly(1995, 9, 4)
             }
         );
@@ -131,12 +131,58 @@ public class UserControllerTests
     }
 
     [Fact]
-    public async Task GetUser_ReturnsNotFound_WhenUserDoesNotExist()
+    public async Task GetUserById_ReturnsNotFound_WhenUserDoesNotExist()
     {
         // Arrange
+        string id = "0";
 
         // Act
-        var result = await _controller.GetUserById("0");
+        var result = await _controller.GetUserById(id);
+
+        // Assert
+        Assert.IsType<NotFoundResult>(result.Result);
+    }
+
+    [Fact]
+    public async Task GetUserByEmail_ReturnsUser_WhenUserExists()
+    {
+        // Arrange
+        string email = "john@example.com";
+
+        var userDTO = _users[0];
+        var user = new User
+        {
+            Id = userDTO.Id,
+            Name = userDTO.Name,
+            FirstName = userDTO.FirstName,
+            LastName = userDTO.LastName,
+            Email = userDTO.Email,
+            Birthdate = userDTO.BirthDate,
+        };
+        user.SetPassword(userDTO.Password);
+
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+
+
+        // Act
+        var result = await _controller.GetUserByEmail(email);
+
+        // Assert
+        var actionResult = Assert.IsType<ActionResult<UserDTO>>(result);
+        var returnValue = Assert.IsType<OkObjectResult>(actionResult.Result);
+        var _userDTO = Assert.IsType<UserDTO>(returnValue.Value);
+        Assert.Equal(userDTO.Id, _userDTO.Id);
+    }
+
+    [Fact]
+    public async Task GetUserByEmail_ReturnsNotFound_WhenUserDoesNotExist()
+    {
+        // Arrange
+        string email = "qualqueremailquenaoexiste@issomesmo.enois";
+
+        // Act
+        var result = await _controller.GetUserByEmail(email);
 
         // Assert
         Assert.IsType<NotFoundResult>(result.Result);

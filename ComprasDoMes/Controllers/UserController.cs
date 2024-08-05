@@ -25,10 +25,22 @@ public class UserController : ControllerBase
             .ToListAsync();
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("id/{id}")]
     public async Task<ActionResult<UserDTO>> GetUserById(string id)
     {
         var user =  await _dbConn.Users.FindAsync(id);
+
+        if (user == null) return NotFound();
+
+        return Ok(UserToDTO(user));
+    }
+
+    [HttpGet("email/{email}")]
+    public async Task<ActionResult<UserDTO>> GetUserByEmail(string email)
+    {
+        var user =  await _dbConn.Users
+        .Where( u => u.Email == email )
+        .FirstOrDefaultAsync();
 
         if (user == null) return NotFound();
 

@@ -108,7 +108,7 @@ public static class UserValidations
             _errors.Add("Sem letras minúsculas", new PasswordException("A senha deve conter ao menos 1 digito numérico."));
         }
 
-        if (!Regex.IsMatch(newPassword, @"\W_"))
+        if (!Regex.IsMatch(newPassword, @"[\W_]"))
         {
             _errors.Add("Sem caracter especial", new PasswordException("A senha deve conter caracteres especiais."));
         }

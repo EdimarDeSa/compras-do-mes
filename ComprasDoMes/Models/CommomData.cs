@@ -11,5 +11,5 @@ public abstract class CommomDataDTO
 {
     public required string Id { get; init; }
     public required string Name { get; set; }
-    // public DateTime Creation { get; set; }
-} 
+    public DateTime Creation => DateTime.Now;
+}

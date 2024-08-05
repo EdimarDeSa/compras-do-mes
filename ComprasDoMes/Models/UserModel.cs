@@ -61,7 +61,7 @@ public class UserDTO : CommomDataDTO
     public required string LastName { get; set; }
     public required string Email { get; set; }
     public required string Password { get; set; }
-    public DateOnly BirthDate { get; set; }
+    public DateOnly Birthdate { get; set; }
     public string FullName => $"{FirstName} {LastName}";
 
     public override string ToString()
@@ -72,7 +72,27 @@ FirstName: {FirstName}
 LastName: {LastName}
 FullName: {FullName}
 Email: {Email}
-BirthDate: {BirthDate}";
+Birthdate: {Birthdate}";
+    }
+}
+
+public class UserEmailDTO
+{
+    public required string Email { get; set; }
+
+    public override string ToString()
+    {
+        return $"Email: {Email}";
+    }
+}
+
+public class UserBirthdateDTO
+{
+    public required DateOnly Birthdate { get; set; }
+
+    public override string ToString()
+    {
+        return $"Birthdate: {Birthdate}";
     }
 }
 

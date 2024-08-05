@@ -32,7 +32,7 @@ public class UserControllerTests
                 LastName = "Doe",
                 Email = "john@example.com",
                 Password = "Str1ng@_s213123",
-                BirthDate = new DateOnly(1995, 9, 4)
+                Birthdate = new DateOnly(1995, 9, 4)
             }
         );
 
@@ -45,7 +45,7 @@ public class UserControllerTests
                 LastName = "Freitas",
                 Email = "Edimar@email.com",
                 Password = "Str1ng@s213123",
-                BirthDate = new DateOnly(1995, 9, 4)
+                Birthdate = new DateOnly(1995, 9, 4)
             }
         );
     }
@@ -80,7 +80,7 @@ public class UserControllerTests
                 FirstName = userDTO.FirstName,
                 LastName = userDTO.LastName,
                 Email = userDTO.Email,
-                Birthdate = userDTO.BirthDate,
+                Birthdate = userDTO.Birthdate,
             };
             user.SetPassword(userDTO.Password);
 
@@ -112,7 +112,7 @@ public class UserControllerTests
             FirstName = userDTO.FirstName,
             LastName = userDTO.LastName,
             Email = userDTO.Email,
-            Birthdate = userDTO.BirthDate,
+            Birthdate = userDTO.Birthdate,
         };
         user.SetPassword(userDTO.Password);
 
@@ -157,7 +157,7 @@ public class UserControllerTests
             FirstName = userDTO.FirstName,
             LastName = userDTO.LastName,
             Email = userDTO.Email,
-            Birthdate = userDTO.BirthDate,
+            Birthdate = userDTO.Birthdate,
         };
         user.SetPassword(userDTO.Password);
 
@@ -185,6 +185,108 @@ public class UserControllerTests
         var result = await _controller.GetUserByEmail(email);
 
         // Assert
+        Assert.IsType<NotFoundResult>(result.Result);
+    }
+
+    [Fact]
+    public async Task UpdateUserEmail_ReturnsNoContent_WhenUserExists()
+    {
+        // Given
+        UserDTO userDTO = _users[0];
+        var user = new User
+        {
+            Id = userDTO.Id,
+            Name = userDTO.Name,
+            FirstName = userDTO.FirstName,
+            LastName = userDTO.LastName,
+            Email = userDTO.Email,
+            Birthdate = userDTO.Birthdate,
+        };
+        user.SetPassword(userDTO.Password);
+
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+
+        string newEmail = "novoemail@email.com";
+        
+        UserEmailDTO userEmailDTO = new UserEmailDTO{
+            Email = newEmail
+        };
+
+        // When
+        var result = await _controller.UpdateUserEmail(user.Id, userEmailDTO);
+    
+        // Then
+        Assert.IsType<NoContentResult>(result.Result);
+    }
+
+    [Fact]
+    public async Task UpdateUserEmail_ReturnsNoContent_WhenUserDoesNotExists()
+    {
+        // Given
+        UserDTO userDTO = _users[0];
+
+        string newEmail = "novoemail@email.com";
+        
+        UserEmailDTO userEmailDTO = new UserEmailDTO{
+            Email = newEmail
+        };
+
+        // When
+        var result = await _controller.UpdateUserEmail(userDTO.Id, userEmailDTO);
+
+        // Then
+        Assert.IsType<NotFoundResult>(result.Result);
+    }
+
+    [Fact]
+    public async Task UpdateUserBirthdate_ReturnsNoContent_WhenUserExists()
+    {
+        // Given
+        UserDTO userDTO = _users[0];
+        var user = new User
+        {
+            Id = userDTO.Id,
+            Name = userDTO.Name,
+            FirstName = userDTO.FirstName,
+            LastName = userDTO.LastName,
+            Email = userDTO.Email,
+            Birthdate = userDTO.Birthdate,
+        };
+        user.SetPassword(userDTO.Password);
+
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+
+        DateOnly newBirthdate = new DateOnly(1995, 12, 22);
+        
+        UserBirthdateDTO userBirthdateDTO = new UserBirthdateDTO {
+            Birthdate = newBirthdate,
+        };
+
+        // When
+        var result = await _controller.UpdateUserBirthDate(userDTO.Id, userBirthdateDTO);
+    
+        // Then
+        Assert.IsType<NoContentResult>(result.Result);
+    }
+
+    [Fact]
+    public async Task UpdateUserBirthdate_ReturnsNoContent_WhenUserDoesNotExists()
+    {
+        // Given
+        UserDTO userDTO = _users[0];
+
+        DateOnly newBirthdate = new DateOnly(1995, 12, 22);
+
+        UserBirthdateDTO userBirthdateDTO = new UserBirthdateDTO {
+            Birthdate = newBirthdate,
+        };
+
+        // When
+        var result = await _controller.UpdateUserBirthDate(userDTO.Id, userBirthdateDTO);
+
+        // Then
         Assert.IsType<NotFoundResult>(result.Result);
     }
 }

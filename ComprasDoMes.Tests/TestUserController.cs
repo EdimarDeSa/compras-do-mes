@@ -28,8 +28,6 @@ public class UserControllerTests
             {
                 Id = "1",
                 Name = "John Doe",
-                FirstName = "John",
-                LastName = "Doe",
                 Email = "john@example.com",
                 Password = "Str1ng@_s213123",
                 Birthdate = new DateOnly(1995, 9, 4)
@@ -41,8 +39,6 @@ public class UserControllerTests
             {
                 Id = "2",
                 Name = "Edimar Freitas",
-                FirstName = "Edimar",
-                LastName = "Freitas",
                 Email = "Edimar@email.com",
                 Password = "Str1ng@s213123",
                 Birthdate = new DateOnly(1995, 9, 4)
@@ -77,8 +73,6 @@ public class UserControllerTests
             User user = new User {
                 Id = userDTO.Id,
                 Name = userDTO.Name,
-                FirstName = userDTO.FirstName,
-                LastName = userDTO.LastName,
                 Email = userDTO.Email,
                 Birthdate = userDTO.Birthdate,
             };
@@ -109,8 +103,6 @@ public class UserControllerTests
         {
             Id = userDTO.Id,
             Name = userDTO.Name,
-            FirstName = userDTO.FirstName,
-            LastName = userDTO.LastName,
             Email = userDTO.Email,
             Birthdate = userDTO.Birthdate,
         };
@@ -154,8 +146,6 @@ public class UserControllerTests
         {
             Id = userDTO.Id,
             Name = userDTO.Name,
-            FirstName = userDTO.FirstName,
-            LastName = userDTO.LastName,
             Email = userDTO.Email,
             Birthdate = userDTO.Birthdate,
         };
@@ -197,8 +187,6 @@ public class UserControllerTests
         {
             Id = userDTO.Id,
             Name = userDTO.Name,
-            FirstName = userDTO.FirstName,
-            LastName = userDTO.LastName,
             Email = userDTO.Email,
             Birthdate = userDTO.Birthdate,
         };

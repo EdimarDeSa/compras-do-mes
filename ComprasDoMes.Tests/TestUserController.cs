@@ -248,8 +248,6 @@ public class UserControllerTests
         {
             Id = userDTO.Id,
             Name = userDTO.Name,
-            FirstName = userDTO.FirstName,
-            LastName = userDTO.LastName,
             Email = userDTO.Email,
             Birthdate = userDTO.Birthdate,
         };

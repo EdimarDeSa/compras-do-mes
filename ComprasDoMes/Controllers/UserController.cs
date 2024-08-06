@@ -68,8 +68,6 @@ public class UserController : ControllerBase
         {
             Id = userDTO.Id,
             Name = userDTO.Name,
-            FirstName = userDTO.FirstName,
-            LastName = userDTO.LastName,
             Email = userDTO.Email,
             Birthdate = userDTO.Birthdate,
         };
@@ -122,8 +120,6 @@ public class UserController : ControllerBase
            Id = user.Id,
            Name = user.Name,
            Password = "",
-           FirstName = user.FirstName,
-           LastName = user.LastName,
            Email = user.Email,
            Birthdate = user.Birthdate,
        };

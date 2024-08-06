@@ -6,8 +6,6 @@ using ComprasDoMes.Models.CommomDataModel;
 namespace ComprasDoMes.Models.UserModel;
 public class User : CommomData
 {
-    public required string FirstName { get; set; }
-    public required string LastName { get; set; }
     private string Password { get; set; } = "";
     public required string Email { get; set; }
     public DateOnly Birthdate { get; set; }
@@ -57,22 +55,17 @@ public class User : CommomData
 }
 public class UserDTO : CommomDataDTO
 {
-    public required string FirstName { get; set; }
-    public required string LastName { get; set; }
     public required string Email { get; set; }
     public required string Password { get; set; }
     public DateOnly Birthdate { get; set; }
-    public string FullName => $"{FirstName} {LastName}";
 
     public override string ToString()
     {
         return $@"Id: {Id}
 Name: {Name}
-FirstName: {FirstName}
-LastName: {LastName}
-FullName: {FullName}
 Email: {Email}
-Birthdate: {Birthdate}";
+Birthdate: {Birthdate}
+Creation Date: {Creation}";
     }
 }
 

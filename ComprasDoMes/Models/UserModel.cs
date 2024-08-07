@@ -41,7 +41,10 @@ public class User : CommomData
     public bool SetBirthDate(DateOnly newBirthDate)
     {
         if (newBirthDate == Birthdate) return false;
+        if (Birthdate.Year < 18) return false;
+
         Birthdate = newBirthDate;
+
         return true;
     }
 

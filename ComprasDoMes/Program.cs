@@ -1,15 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using ComprasDoMes.Models;
+using ComprasDoMes.Models.Internacionalizations;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
-
 builder.Services.AddDbContext<ComprasDoMesContext>( opt => opt.UseInMemoryDatabase("ComprasDoMes") );
+builder.Services.AddSingleton<Internacionalization>();
 
 builder.Services.AddEndpointsApiExplorer();
-
 builder.Services.AddSwaggerGen();
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
@@ -20,11 +20,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();

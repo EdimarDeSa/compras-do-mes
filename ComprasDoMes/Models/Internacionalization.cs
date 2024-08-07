@@ -1,9 +1,9 @@
 namespace ComprasDoMes.Models.Internacionalizations;
 
-public enum InternacionalizationLanguage
+public enum InternacionalizationLang
 {
     En,
-    Pt_BR,
+    Pt_BR
 }
 
 public enum InternacionalizationMessage
@@ -17,7 +17,7 @@ public class InternacionalizationMessageDictionary : Dictionary<Internacionaliza
     public InternacionalizationMessageDictionary() : base() { }
 }
 
-public class InternacionalizationLanguageDictionary : Dictionary<string, InternacionalizationMessageDictionary>
+public class InternacionalizationLanguageDictionary : Dictionary<InternacionalizationLang, InternacionalizationMessageDictionary>
 {
     public InternacionalizationLanguageDictionary() : base() { }
 }
@@ -32,13 +32,14 @@ public class Internacionalization
         _messages = new InternacionalizationLanguageDictionary
         {
             {
-                "pt_br", new InternacionalizationMessageDictionary
+                InternacionalizationLang.Pt_BR, new InternacionalizationMessageDictionary
                 {
-                    { InternacionalizationMessage.UserIdExists, "Id de usuário já em uso!" }
+                    { InternacionalizationMessage.UserIdExists, "Id de usuário já em uso!" },
+                    { InternacionalizationMessage.UserDontExists, "Usuário não existe!"}
                 }
             },
             {
-                "en", new InternacionalizationMessageDictionary
+                InternacionalizationLang.En, new InternacionalizationMessageDictionary
                 {
                     { InternacionalizationMessage.UserIdExists, "User id already exists!" }
                 }
@@ -46,7 +47,7 @@ public class Internacionalization
         };
     }
 
-    public string GetMessage(string language, InternacionalizationMessage message)
+    public string GetMessage(InternacionalizationLang language, InternacionalizationMessage message)
     {
         if ( _messages.TryGetValue(language, out var langDict))
         {

@@ -34,8 +34,13 @@ public class UserController : ControllerBase
     {
         var user =  await _dbConn.Users.FindAsync(id);
 
+        Console.WriteLine(_internacionalization.GetMessage(
+            InternacionalizationLang.Pt_BR, InternacionalizationMessage.UserDontExists
+        ));
+        Console.WriteLine(id);
+
         if (user == null) return NotFound(_internacionalization.GetMessage(
-            "pt_br", InternacionalizationMessage.UserDontExists
+            InternacionalizationLang.Pt_BR, InternacionalizationMessage.UserDontExists
         ));
 
         return Ok(UserToDTO(user));

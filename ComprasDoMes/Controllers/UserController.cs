@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 using ComprasDoMes.Models;
 using ComprasDoMes.Models.UserModel;
+using ComprasDoMes.Models.Internacionalizations;
 using ComprasDoMes.Exceptions;
 
 namespace ComprasDoMes.Controllers;
@@ -12,9 +13,12 @@ namespace ComprasDoMes.Controllers;
 public class UserController : ControllerBase
 {
     private readonly ComprasDoMesContext _dbConn;
-    public UserController(ComprasDoMesContext dbConn)
+    private readonly Internacionalization _internacionalization;
+
+    public UserController(ComprasDoMesContext dbConn, Internacionalization internacionalization)
     {
         _dbConn = dbConn;
+        _internacionalization = internacionalization;
     }
 
     [HttpGet]
@@ -30,7 +34,9 @@ public class UserController : ControllerBase
     {
         var user =  await _dbConn.Users.FindAsync(id);
 
-        if (user == null) return NotFound();
+        if (user == null) return NotFound(_internacionalization.GetMessage(
+            "pt_br", InternacionalizationMessage.UserDontExists
+        ));
 
         return Ok(UserToDTO(user));
     }
@@ -56,6 +62,8 @@ public class UserController : ControllerBase
         PasswordExceptions passwordExceptions = UserValidations.ValidatePassword(userDTO.Password, "");
         if(!passwordExceptions.IsValid()) return BadRequest(passwordExceptions.ToString());
 
+        Console.WriteLine("", userDTO.Id);
+
         var existsId = await _dbConn.Users.FindAsync(userDTO.Id);
 
         if (existsId != null) return BadRequest("User id already exists!");
@@ -66,7 +74,6 @@ public class UserController : ControllerBase
 
         User user = new User
         {
-            Id = userDTO.Id,
             Name = userDTO.Name,
             Email = userDTO.Email,
             Birthdate = userDTO.Birthdate,
@@ -92,6 +99,10 @@ public class UserController : ControllerBase
         var user =  await _dbConn.Users.FindAsync(id);
 
         if (user == null) return NotFound();
+
+        user = await _dbConn.Users.Where( u => u.Email == updateUserEmailDTO.Email ).FirstAsync();
+
+        if (user == null) return BadRequest("Email already in use!");
 
         user.Email = updateUserEmailDTO.Email;
 

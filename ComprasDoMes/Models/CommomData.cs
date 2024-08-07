@@ -2,14 +2,7 @@ namespace ComprasDoMes.Models.CommomDataModel;
 
 public abstract class CommomData
 {
-    public required string Id { get; set; }
+    public string Id { get; init; } = Guid.NewGuid().ToString();
     public required string Name { get; set; }
     public DateTime Creation { get; } = DateTime.Now;
-}
-
-public abstract class CommomDataDTO
-{
-    public required string Id { get; init; }
-    public required string Name { get; set; }
-    public DateTime Creation => DateTime.Now;
 }

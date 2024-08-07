@@ -53,7 +53,7 @@ public class User : CommomData
         }
     }
 }
-public class UserDTO : CommomDataDTO
+public class UserDTO : CommomData
 {
     public required string Email { get; set; }
     public required string Password { get; set; }

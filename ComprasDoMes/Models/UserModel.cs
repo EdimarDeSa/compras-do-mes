@@ -2,23 +2,26 @@ using System.Text.RegularExpressions;
 using ComprasDoMes.Exceptions;
 using ComprasDoMes.Exceptions.IValidationExceptions;
 using ComprasDoMes.Models.CommomDataModel;
+using ComprasDoMes.Models.Internacionalizations;
 
 namespace ComprasDoMes.Models.UserModel;
-public class User : CommomData
+public class User : CommomUserData
 {
     private string Password { get; set; } = "";
     public required string Email { get; set; }
     public DateOnly Birthdate { get; set; }
+    private readonly UserValidations _userValidations;
+
+    public User()
+    {
+        _userValidations = new();
+    } 
 
     public bool SetPassword(string newPassword)
     {
-        PasswordExceptions errors = UserValidations.ValidatePassword(newPassword, Password);
+        PasswordExceptions errors = _userValidations.ValidatePassword(newPassword, Password, Language);
 
-        if (!errors.IsValid())
-        {
-            ShowErrors(errors);
-            return false;
-        }
+        if (!errors.IsValid()) return false;
 
         Password = newPassword;
         return true;
@@ -26,13 +29,9 @@ public class User : CommomData
     
     public bool SetEmail(string newEmail)
     {
-        EmailExceptions errors = UserValidations.ValidateEmail(newEmail, Email);
+        EmailExceptions errors = _userValidations.ValidateEmail(newEmail, Email, Language);
 
-        if (!errors.IsValid())
-        {
-            ShowErrors(errors);
-            return false;
-        }
+        if (!errors.IsValid()) return false;
 
         Email = newEmail;
         return true;
@@ -47,16 +46,9 @@ public class User : CommomData
 
         return true;
     }
-
-    private static void ShowErrors(IValidationExceptions errors)
-    {
-        foreach (var error in errors.GetAllExceptions())
-        {
-            Console.WriteLine($"Erro: {error.Key} - {error.Value.ToString()}");
-        }
-    }
 }
-public class UserDTO : CommomData
+
+public class UserDTO : CommomUserData
 {
     public required string Email { get; set; }
     public required string Password { get; set; }
@@ -92,58 +84,60 @@ public class UserBirthdateDTO
     }
 }
 
-
-public static class UserValidations
+public class UserValidations
 {
-        public static PasswordExceptions ValidatePassword(string newPassword, string current)
+    public readonly Internacionalization _internacionalization;
+
+    public UserValidations()
+    {
+        _internacionalization = new();
+    }
+    
+
+    public PasswordExceptions ValidatePassword(string newPassword, string currentPassword, InternacionalizationLanguage language)
     {
         PasswordExceptions _errors = new PasswordExceptions();
+        List<InternacionalizationMessage> errorList = new();
 
-        if (newPassword == current)
-        {
-            _errors.Add("Senha identica", new PasswordException("A nova senha deve ser diferente da anterior."));
-        }
+        if (newPassword == currentPassword) 
+            errorList.Add(InternacionalizationMessage.PasswordSame);
 
-        if (newPassword.Length < 8)
-        {
-            _errors.Add("Tamanho insuficiente", new PasswordException("A senha deve conter pelo menos 8 dígitos"));
-        }
+        if (newPassword.Length < 8) 
+            errorList.Add(InternacionalizationMessage.PasswordLenght);
 
         if (!Regex.IsMatch(newPassword, @"[A-Z]"))
-        {
-            _errors.Add("Sem letras maiúsculas", new PasswordException("A senha deve conter ao menos 1 letra maiúscula."));
-        }
+            errorList.Add(InternacionalizationMessage.PasswordNeedUpperCase);
 
         if (!Regex.IsMatch(newPassword, @"[a-z]"))
-        {
-            _errors.Add("Sem letras minúsculas", new PasswordException("A senha deve conter ao menos 1 letra minuscula."));
-        }
+            errorList.Add(InternacionalizationMessage.PasswordNeedLowerCase);
 
         if (!Regex.IsMatch(newPassword, @"[0-9]"))
-        {
-            _errors.Add("Sem letras minúsculas", new PasswordException("A senha deve conter ao menos 1 digito numérico."));
-        }
+            errorList.Add(InternacionalizationMessage.PasswordNeedNumber);
 
         if (!Regex.IsMatch(newPassword, @"[\W_]"))
-        {
-            _errors.Add("Sem caracter especial", new PasswordException("A senha deve conter caracteres especiais."));
-        }
+            errorList.Add(InternacionalizationMessage.PasswordNeedSpecial);
 
+        foreach (InternacionalizationMessage message in errorList)
+        {
+            _errors.Add(message, new PasswordException(_internacionalization.GetMessage(language, message)));
+        }
         return _errors;
     }
 
-    public static EmailExceptions ValidateEmail(string newEmail, string current)
+    public EmailExceptions ValidateEmail(string newEmail, string currentEmail, InternacionalizationLanguage language)
     {
         EmailExceptions _errors = new EmailExceptions();
+        List<InternacionalizationMessage> errorList = new();
 
-        if (newEmail == current)
-        {
-            _errors.Add("E-mail similar", new EmailException("O e-mail deve ser differente do anterior."));
-        }
+        if (newEmail == currentEmail)
+            errorList.Add(InternacionalizationMessage.EmailSame);
 
         if (!Regex.IsMatch(newEmail, @".+\@\w+\.\w+"))
+            errorList.Add(InternacionalizationMessage.EmailInvalid);
+
+        foreach (InternacionalizationMessage message in errorList)
         {
-            _errors.Add("E-mail inválido", new EmailException("O e-mail deve ter a seguinte estrutura:\nexemplo@dominio.com"));
+            _errors.Add(message, new EmailException(_internacionalization.GetMessage(language, message)));
         }
 
         return _errors;

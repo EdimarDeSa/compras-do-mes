@@ -1,13 +1,13 @@
-using Microsoft.AspNetCore.Diagnostics;
+using ComprasDoMes.Models.Internacionalizations;
 
 namespace ComprasDoMes.Exceptions.IValidationExceptions
 {  
     public interface IValidationExceptions
     {
-        IDictionary<string, Exception> Errors { get; }
-        void Add(string error, Exception errorInstance);
-        void Remove(string error);
-        IReadOnlyDictionary<string, Exception> GetAllExceptions();
+        IDictionary<InternacionalizationMessage, Exception> Errors { get; }
+        void Add(InternacionalizationMessage error, Exception errorInstance);
+        void Remove(InternacionalizationMessage error);
+        IReadOnlyDictionary<InternacionalizationMessage, Exception> GetAllExceptions();
         bool IsValid();
     }
 }
@@ -25,26 +25,26 @@ namespace ComprasDoMes.Exceptions.ValidationExceptionsBases
 
     public abstract class BaseValidationExceptions : IValidationExceptions
     {
-        protected readonly Dictionary<string, Exception> _errors = new();
-        public IDictionary<string, Exception> Errors => _errors;
+        protected readonly Dictionary<InternacionalizationMessage, Exception> _errors = new();
+        public IDictionary<InternacionalizationMessage, Exception> Errors => _errors;
 
-        public void Add(string error, Exception errorInstance)
+        public void Add(InternacionalizationMessage error, Exception errorInstance)
         {
             if(_errors.ContainsKey(error)) return;
 
             _errors.Add(error, errorInstance);
         }
 
-        public void Remove(string error)
+        public void Remove(InternacionalizationMessage error)
         {
             if(!_errors.ContainsKey(error)) return;
 
             _errors.Remove(error);
         }
 
-        public IReadOnlyDictionary<string, Exception> GetAllExceptions()
+        public IReadOnlyDictionary<InternacionalizationMessage, Exception> GetAllExceptions()
         {
-            return new ReadOnlyDictionary<string, Exception>(Errors);
+            return new ReadOnlyDictionary<InternacionalizationMessage, Exception>(Errors);
         }
 
         public bool IsValid()
